@@ -1,21 +1,21 @@
-package br.com.starcode.jerichoselector;
+package br.com.starcode.jerichoselector.model;
 
-public class AttributeSelector {
+public class AttributeSelector extends SimpleSelector {
 
     private String name;
     private AttributeOperator operator;
     private String value;
-    private String context;
     
     public AttributeSelector(
             String name, 
             AttributeOperator operator,
             String value,
-            String context) {
+            Combinator combinator,
+            Context context) {
+        super(combinator, context);
         this.name = name;
         this.operator = operator;
         this.value = value;
-        this.context = context;
     }
     
     public String getName() {
@@ -28,10 +28,6 @@ public class AttributeSelector {
     
     public String getValue() {
         return value;
-    }
-    
-    public String getContext() {
-        return context;
     }
     
 }

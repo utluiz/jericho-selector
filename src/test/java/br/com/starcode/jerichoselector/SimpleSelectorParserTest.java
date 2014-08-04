@@ -6,182 +6,81 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
+import br.com.starcode.jerichoselector.model.AttributeSelector;
+import br.com.starcode.jerichoselector.model.Context;
+import br.com.starcode.jerichoselector.model.PseudoSelector;
+import br.com.starcode.jerichoselector.model.Combinator;
+
 /**
  * Selector list:
  * http://www.w3.org/TR/css3-selectors/#selectors
  *
  */
-public class SelectorParserTest {
+public class SimpleSelectorParserTest {
 
-    @Test
-    public void nullValue() {
-        
-        boolean hasException = false;
-        try {
-            new SelectorParser(null, null);
-        } catch (IllegalArgumentException e) {
-            hasException = true;
-        }
-        Assert.assertTrue(hasException);
-        
-    }
-    
-    @Test
-    public void empty() {
-        
-        boolean hasException = false;
-        try {
-            new SelectorParser("", null);
-        } catch (IllegalArgumentException e) {
-            hasException = true;
-        }
-        Assert.assertTrue(hasException);
-        
-    }
-    
-    @Test
-    public void testNull() {
-        
-        boolean hasException = false;
-        try {
-            new SelectorParser("*", null);
-        } catch (IllegalArgumentException e) {
-            hasException = true;
-        }
-        Assert.assertTrue(hasException);
-        
-    }
-    
-    @Test
-    public void endUnexpected() {
-        
-        boolean hasException = false;
-        try {
-            new SelectorParser("a > ", new Listener()).interpret();
-        } catch (SelectorParserException e) {
-            hasException = true;
-        }
-        Assert.assertTrue(hasException);
-        
-    }
-    
-    @Test
-    public void contentLeft() {
-        
-        boolean hasException = false;
-        try {
-            new SelectorParser("a z ^", new Listener()).interpret();
-        } catch (SelectorParserException e) {
-            hasException = true;
-        }
-        Assert.assertTrue(hasException);
-        
-    }
-    
-   /* @Test
-    public void expectIdentifier() {
-        
-        boolean hasException = false;
-        try {
-            new SelectorParser("[a=]", new Listener()).interpret();
-        } catch (SelectorParserException e) {
-            hasException = true;
-        }
-        Assert.assertTrue(hasException);
-        
-    }*/
-
-    @Test
-    public void expectIdentifier2() {
-        
-        boolean hasException = false;
-        try {
-            new SelectorParser("[=]", new Listener()).interpret();
-        } catch (SelectorParserException e) {
-            hasException = true;
-        }
-        Assert.assertTrue(hasException);
-        
-    }
-    
-    @Test
-    public void expectToken() {
-        
-        boolean hasException = false;
-        try {
-            new SelectorParser("[a", new Listener()).interpret();
-        } catch (SelectorParserException e) {
-            hasException = true;
-        }
-        Assert.assertTrue(hasException);
-        
-    }
-    
-    @Test
-    public void expectIdentifier3() {
-        
-        boolean hasException = false;
-        try {
-            new SelectorParser("a#", new Listener()).interpret();
-        } catch (SelectorParserException e) {
-            hasException = true;
-        }
-        Assert.assertTrue(hasException);
-        
-    }
-    
-    @Test
-    public void expectIdentifier4() {
-        
-        boolean hasException = false;
-        try {
-            new SelectorParser("x.", new Listener()).interpret();
-        } catch (SelectorParserException e) {
-            hasException = true;
-        }
-        Assert.assertTrue(hasException);
-        
-    }
-
-    private class Listener implements SelectorParserListener {
+    private class Listener implements ParserListener {
         
         final List<String> lista = new ArrayList<String>();
         
-        public void endSelectorGroup(int number, SelectorParserContext context) {
+        public void endGroup(int number, Context context) {
             lista.add("endSelectorGroup=" + number);
         }
         
-        public void beginSelectorGroup(int number, SelectorParserContext context) {
+        public void beginSelectorGroup(int number, Context context) {
             lista.add("beginSelectorGroup=" + number);
         }
 
-        public void typeSelector(SelectorParserContext context) {
+        public void typeSelector(Context context) {
             lista.add("typeSelector=" + context.getContext());
         }
 
         public void simpleSelector(int number,
-                SelectorCombinator combinator, SelectorParserContext context) {
+                Combinator combinator, Context context) {
             lista.add("simpleSelector=" + number + "|" 
                 + (combinator != null ? combinator.getSign() : null) + "|" + context.getContext());
         }
 
         public void classSelector(int number,
-                SelectorParserContext context) {
+                Context context) {
             lista.add("classSelector=" + number + "|" + context.getContext());
         }
 
         public void idSelector(int number,
-                SelectorParserContext context) {
+                Context context) {
             lista.add("idSelector=" + number + "|" + context.getContext());
         }
 
         public void attributeSelector(int number,
-                AttributeSelector as, SelectorParserContext context) {
+                AttributeSelector as, Context context) {
             lista.add("attributeSelector=" + number + "|" + context.getContext());
         }
         
         public List<String> getLista() {
             return lista;
+        }
+
+        public void pseudoSelector(int number, PseudoSelector pseudoSelector, Context context) {
+            lista.add("pseudoSelector=" + number + "|" + pseudoSelector.getType().toString() + "|" + context.getContext());
+        }
+
+        public void negationTypeSelector(int number, Context context) {
+            lista.add("negationTypeSelector=" + number + "|" + context.getContext());
+        }
+
+        public void negationClassSelector(int number, Context context) {
+            lista.add("negationClassSelector=" + number + "|" + context.getContext());
+        }
+
+        public void negationAttributeSelector(int number, AttributeSelector type, Context context) {
+            lista.add("negationAttributeSelector=" + number + "|" + context.getContext());
+        }
+
+        public void negationIdSelector(int number, Context context) {
+            lista.add("negationIdSelector=" + number + "|" + context.getContext());
+        }
+
+        public void negationPseudoSelector(int number, PseudoSelector pseudoSelector, Context context) {
+            lista.add("negationPseudoSelector=" + number + "|" + context.getContext());
         }
         
     }
@@ -190,7 +89,7 @@ public class SelectorParserTest {
     public void universal() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser("*", l).interpret();
+        new Parser("*", l).interpret();
         Assert.assertEquals(4, l.getLista().size());
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=*", l.getLista().get(1));
@@ -204,7 +103,7 @@ public class SelectorParserTest {
     public void element() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser("table", l).interpret();
+        new Parser("table", l).interpret();
         Assert.assertEquals(4, l.getLista().size());
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=table", l.getLista().get(1));
@@ -218,7 +117,7 @@ public class SelectorParserTest {
     public void classSelector() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser(".class", l).interpret();
+        new Parser(".class", l).interpret();
         Assert.assertEquals(4, l.getLista().size());
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
         Assert.assertEquals("classSelector=0|class", l.getLista().get(1));
@@ -232,7 +131,7 @@ public class SelectorParserTest {
     public void idSelector() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser("#identifier", l).interpret();
+        new Parser("#identifier", l).interpret();
         Assert.assertEquals(4, l.getLista().size());
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
         Assert.assertEquals("idSelector=0|identifier", l.getLista().get(1));
@@ -246,7 +145,7 @@ public class SelectorParserTest {
     public void attributeSelector() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser("[name='test']", l).interpret();
+        new Parser("[name='test']", l).interpret();
         Assert.assertEquals(4, l.getLista().size());
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
         Assert.assertEquals("attributeSelector=0|name='test'", l.getLista().get(1));
@@ -260,7 +159,7 @@ public class SelectorParserTest {
     public void attributeEscapeSelector() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser("[name='\\'test\\'']", l).interpret();
+        new Parser("[name='\\'test\\'']", l).interpret();
         Assert.assertEquals(4, l.getLista().size());
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
         Assert.assertEquals("attributeSelector=0|name=''test''", l.getLista().get(1));
@@ -273,7 +172,7 @@ public class SelectorParserTest {
     public void childSelector() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser("#id > .class", l).interpret();
+        new Parser("#id > .class", l).interpret();
         Assert.assertEquals(6, l.getLista().size());
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
         Assert.assertEquals("idSelector=0|id", l.getLista().get(1));
@@ -289,7 +188,7 @@ public class SelectorParserTest {
     public void siblingDescendantSelector() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser("a ~ #id .class", l).interpret();
+        new Parser("a ~ #id .class", l).interpret();
         Assert.assertEquals(8, l.getLista().size());
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=a", l.getLista().get(1));
@@ -307,7 +206,7 @@ public class SelectorParserTest {
     public void composedSelector() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser("div.class1#id.class2", l).interpret();
+        new Parser("div.class1#id.class2", l).interpret();
         //System.out.println(l.getLista());
         Assert.assertEquals(7, l.getLista().size());
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
@@ -324,18 +223,18 @@ public class SelectorParserTest {
     public void attributeMultipleSelector() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser("*[onlyName], a[href~=https] ,.class[name|=\"name\"] , "
-                + "span#composed-id[attr=val],[z-indez*='1'],"
+        new Parser("*[_onlyName], a[href~=https] ,.class[name|=\"name\"] , "
+                + "span#composed-id[attr=_val],[z-indez*='1'],"
                 + "[href][data-aria^='1']", l).interpret();
-        System.out.println(l.getLista());
+        //System.out.println(l.getLista());
         
         //Assert.assertEquals(7, l.getLista().size());
         
         //group 0
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=*", l.getLista().get(1));
-        Assert.assertEquals("attributeSelector=0|onlyName", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|*[onlyName]", l.getLista().get(3));
+        Assert.assertEquals("attributeSelector=0|_onlyName", l.getLista().get(2));
+        Assert.assertEquals("simpleSelector=0|null|*[_onlyName]", l.getLista().get(3));
         Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
         
         //group 1
@@ -356,8 +255,8 @@ public class SelectorParserTest {
         Assert.assertEquals("beginSelectorGroup=3", l.getLista().get(15));
         Assert.assertEquals("typeSelector=span", l.getLista().get(16));
         Assert.assertEquals("idSelector=0|composed-id", l.getLista().get(17));
-        Assert.assertEquals("attributeSelector=1|attr=val", l.getLista().get(18));
-        Assert.assertEquals("simpleSelector=0|null|span#composed-id[attr=val]", l.getLista().get(19));
+        Assert.assertEquals("attributeSelector=1|attr=_val", l.getLista().get(18));
+        Assert.assertEquals("simpleSelector=0|null|span#composed-id[attr=_val]", l.getLista().get(19));
         Assert.assertEquals("endSelectorGroup=3", l.getLista().get(20));
         
         //group 4
@@ -379,7 +278,7 @@ public class SelectorParserTest {
     public void adjascentGroupSelector() throws Exception {
         
         Listener l = new Listener();
-        new SelectorParser("li + li.class1.class2,table#id tr", l).interpret();
+        new Parser("li + li.class1.class2,table#id tr", l).interpret();
         //System.out.println(l.getLista());
         Assert.assertEquals(15, l.getLista().size());
         Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));

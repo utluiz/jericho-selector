@@ -1,4 +1,4 @@
-package br.com.starcode.jerichoselector;
+package br.com.starcode.jerichoselector.model;
 
 public enum AttributeOperator {
     

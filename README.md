@@ -20,6 +20,7 @@ Roadmap:
 1. Build a CSS3 Selector parser based on [W3C Official Specification][3] (Status: almost done, lacks pseudo-selector `:` and UTF-8 Characters Support)
 2. Jericho Implementation for selection using the result of step 1 (`TODO`)
 3. Fluent API (`TODO`).
+4. Show correct position on erros (need to store previous token positions)
 
   [1]: http://jericho.htmlparser.net
   [2]: http://jsoup.org/

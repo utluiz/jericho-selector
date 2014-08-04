@@ -1,12 +1,12 @@
-package br.com.starcode.jerichoselector;
+package br.com.starcode.jerichoselector.model;
 
-public enum SelectorCombinator {
+public enum Combinator {
     
     ADJASCENT_SIBLING("+"), CHILD(">"), GENERAL_SIBLING("~"), DESCENDANT(" ");
     
     private String sign;
     
-    private SelectorCombinator(String sign) {
+    private Combinator(String sign) {
         this.sign = sign;
     }
     
