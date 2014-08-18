@@ -8,7 +8,6 @@ import br.com.starcode.jerichoselector.model.AttributeSelector;
 import br.com.starcode.jerichoselector.model.ClassSelector;
 import br.com.starcode.jerichoselector.model.Combinator;
 import br.com.starcode.jerichoselector.model.Context;
-import br.com.starcode.jerichoselector.model.Group;
 import br.com.starcode.jerichoselector.model.HashSelector;
 import br.com.starcode.jerichoselector.model.NegationSelector;
 import br.com.starcode.jerichoselector.model.PseudoExpression;
@@ -24,7 +23,6 @@ import br.com.starcode.jerichoselector.model.TypeSelector;
 /**
  * Selector list:
  * http://www.w3.org/TR/css3-selectors/#selectors
- *
  */
 public class Parser {
 
@@ -45,10 +43,6 @@ public class Parser {
         this.content = selector;
         this.pos = -1;
         this.len = selector.length();
-    }
-    
-    protected Context context(String context) {
-        return new Context(content, context, pos, pos);
     }
     
     protected Character next() {
@@ -73,19 +67,17 @@ public class Parser {
     /**
      * selectors_group
      *  : selector [ COMMA S* selector ]*
-     *  ;
      */
-    public List<Group> groups() throws ParserException {
+    public List<Selector> groups() throws ParserException {
 
-        List<Group> groups = new ArrayList<Group>();
+        List<Selector> groups = new ArrayList<Selector>();
         int groupNumber = 0;
         while (!end()) {
             ignoreWhitespaces();
             parserListener.beginGroup(groupNumber, pos);
             Selector selector = selector();
-            Group group = new Group(selector, context(selector.toString()));
-            groups.add(group);
-            parserListener.endGroup(group);
+            groups.add(selector);
+            parserListener.endGroup(selector);
             groupNumber++;
             ignoreWhitespaces();
             if (!end() && current != ',') {
@@ -104,50 +96,53 @@ public class Parser {
      *  
      *  combinator
      *  : PLUS S* | GREATER S* | TILDE S* | S+
-     *  ;
      */
-    public List<SimpleSelector> selector() throws ParserException {
-        int selectorCount = 0;
-        Combinator combinator = null;
+    public Selector selector() throws ParserException {
+        int initialPosition = pos;
         StringBuilder sb = new StringBuilder();
-        List<SimpleSelector> simpleSelectors = new ArrayList<SimpleSelector>();
+        List<SimpleSelectorSequence> simpleSelectors = new ArrayList<SimpleSelectorSequence>();
+        List<Combinator> combinators = new ArrayList<Combinator>();
         while (!end()) {
-            SimpleSelector simpleSelector = simpleSelectorSequence();
-            sb.append(simpleSelector);
+        	//finds combinator, but not in the first iteration
+        	Combinator combinator = null;
+        	if (!simpleSelectors.isEmpty()) {
+        		//stores if it has spaces until the next token
+                boolean hasWhitespace = false;
+                if (!end() && Character.isWhitespace(current)) {
+                    hasWhitespace = true;
+                    ignoreWhitespaces();
+                }
+                if (!end()) {
+                    //implements "combinator" rule
+                    if (current == '+') combinator = Combinator.ADJASCENT_SIBLING;
+                    else if (current == '>') combinator = Combinator.CHILD;
+                    else if (current == '~') combinator = Combinator.GENERAL_SIBLING;
+                    //if hasn't any but spaces
+                    else if (hasWhitespace) combinator = Combinator.DESCENDANT;
+                    //is it the end?
+                    if (combinator == null || current == ',') {
+                        break;
+                    }
+                    sb.append(current);
+                    //don't advance because spaces were just advanced
+                    if (combinator != Combinator.DESCENDANT) {
+                        next();
+                    }
+                    ignoreWhitespaces();
+                    if (end()) {
+                        throw new ParserException("Unexpected end of selector at position " + pos);
+                    }
+                }
+        		combinators.add(combinator);
+        	}
+        	//get next sequence
+            SimpleSelectorSequence simpleSelectorSequence = simpleSelectorSequence();
+            sb.append(simpleSelectorSequence);
             //sends combinator here (the first case it's null)
-            simpleSelectors.add(simpleSelector);
-            parserListener.selectorSequence(simpleSelector);
-            //clear last result
-            combinator = null;
-            //stores if it has spaces until the next token
-            boolean hasWhitespace = false;
-            if (!end() && Character.isWhitespace(current)) {
-                hasWhitespace = true;
-                ignoreWhitespaces();
-            }
-            if (!end()) {
-                //implements "combinator" rule
-                if (current == '+') combinator = Combinator.ADJASCENT_SIBLING;
-                else if (current == '>') combinator = Combinator.CHILD;
-                else if (current == '~') combinator = Combinator.GENERAL_SIBLING;
-                //if hasn't any but had spaces
-                else if (hasWhitespace) combinator = Combinator.DESCENDANT;
-                if (combinator == null || current == ',') {
-                    break;
-                }
-                sb.append(current);
-                //don't advance because spaces were just advanced
-                if (combinator != Combinator.DESCENDANT) {
-                    next();
-                }
-                ignoreWhitespaces();
-                selectorCount++;
-                if (end()) {
-                    throw new ParserException("Unexpected end of selector at position " + pos);
-                }
-            }
+            simpleSelectors.add(simpleSelectorSequence);
+            parserListener.selectorSequence(simpleSelectorSequence, combinator);
         }
-        return new Selector(simpleSelectors, context(sb.toString()));;
+        return new Selector(simpleSelectors, combinators, new Context(content, sb.toString(), initialPosition, pos));
     }
     
     /**
@@ -155,54 +150,50 @@ public class Parser {
      *  : [ type_selector | universal ]
      *    [ HASH | class | attrib | pseudo | negation ]*
      *  | [ HASH | class | attrib | pseudo | negation ]+
-     *  ;
      *  
      *  type_selector
      *  : [ namespace_prefix ]? element_name
-     *  ;
      *
      * namespace_prefix ** not implemented
      *  : [ IDENT | '*' ]? '|'
-     *  ;
      *
      * element_name
      *  : IDENT
-     *  ;
      *
      * universal
      *  : [ namespace_prefix ]? '*'
-     *  ;
      *
      * class
      *  : '.' IDENT
-     *  ;
      */
-    public SimpleSelector simpleSelectorSequence() throws ParserException {
+    public SimpleSelectorSequence simpleSelectorSequence() throws ParserException {
         
-        List<SimpleSelector> list = new ArrayList<SimpleSelector>();
+        List<SimpleSelector> simpleSelectorList = new ArrayList<SimpleSelector>();
         StringBuilder sb = new StringBuilder();
         boolean hasSimpleSelector = false;
+        int initialPos = pos;
         if (current == '*') {
             //universal selector
             sb.append(current);
             hasSimpleSelector = true;
-            TypeSelector ts = new TypeSelector("*", context("*"));
+            TypeSelector ts = new TypeSelector("*", new Context(content, "*", initialPos, pos));
             parserListener.typeSelector(ts);
-            list.add(ts);
+            simpleSelectorList.add(ts);
             next();
         } else if (Character.isLetter(current)) {
             //type selector
             String type = identifier();
             sb.append(type);
             hasSimpleSelector = true;
-            TypeSelector ts = new TypeSelector(type, context(type));
+            TypeSelector ts = new TypeSelector(type, new Context(content, type, initialPos, pos));
             parserListener.typeSelector(ts);
-            list.add(ts);
+            simpleSelectorList.add(ts);
         }
         
         int selectorCount = 0;
         boolean hasPseudoElement = false;
         while (!end()) {
+        	int initialLoopPos = pos;
             if (current == '.') {
                 //class selector
                 sb.append(current);
@@ -212,8 +203,8 @@ public class Parser {
                     throw new ParserException("Expected className at position " + pos);
                 }
                 sb.append(className);
-                ClassSelector cs = new ClassSelector(className, context("." + className));
-                list.add(cs);
+                ClassSelector cs = new ClassSelector(className, new Context(content, "." + className, initialLoopPos, pos));
+                simpleSelectorList.add(cs);
                 parserListener.classSelector(cs);
             } else if (current == '#') {
                 //hash selector
@@ -223,8 +214,8 @@ public class Parser {
                 if (id == null || id.isEmpty()) {
                     throw new ParserException("Expected id at position " + pos);
                 }
-                HashSelector hs = new HashSelector(id, context("#" + id));
-                list.add(hs);
+                HashSelector hs = new HashSelector(id, new Context(content, "#" + id, initialLoopPos, pos));
+                simpleSelectorList.add(hs);
                 parserListener.idSelector(hs);
                 sb.append(id);
             } else if (current == '[') {
@@ -232,7 +223,7 @@ public class Parser {
                 sb.append(current);
                 next();
                 AttributeSelector as = attribute();
-                list.add(as);
+                simpleSelectorList.add(as);
                 parserListener.attributeSelector(as);
                 sb.append(as);
                 sb.append(']');
@@ -261,20 +252,20 @@ public class Parser {
                         throw new ParserException("Only one pseudo-element is allowed for each simple selector and a second one was found at position " + pos);
                     }
                     PseudoSelector ps = pseudo(ident, PseudoType.PseudoElement, doubleColon);
-                    list.add(ps);
+                    simpleSelectorList.add(ps);
                     parserListener.pseudoSelector(ps);
                     sb.append(ps);
                     hasPseudoElement = true;
                 } else if ("not".equalsIgnoreCase(ident)) {
                     //negation
                     NegationSelector n = negation(selectorCount);
-                    list.add(n);
+                    simpleSelectorList.add(n);
                     sb.append(ident);
                     sb.append(n);
                 } else {
                     //pseudo-class
                     PseudoSelector ps = pseudo(ident, PseudoType.PseudoClass, false);
-                    list.add(ps);
+                    simpleSelectorList.add(ps);
                     parserListener.pseudoSelector(ps);
                     sb.append(ps);
                 }
@@ -287,7 +278,7 @@ public class Parser {
             throw new ParserException("No real selector found at position " + pos);
         }
             
-        return list
+        return new SimpleSelectorSequence(simpleSelectorList, new Context(content, sb.toString(), initialPos, pos));
         
     }
     
@@ -301,10 +292,10 @@ public class Parser {
      *            INCLUDES |
      *            DASHMATCH ] S* [ IDENT | STRING ] S*
      *        ]? ']'
-     *  ;
      */
     protected AttributeSelector attribute() throws ParserException {
         
+    	int initialPos = pos;
         StringBuilder sb = new StringBuilder();
         ignoreWhitespaces();
         String name = !end() ? identifier() : null;
@@ -361,9 +352,10 @@ public class Parser {
         if (end() || current != ']') {
             throw new ParserException("Token ']' expected at position " + pos);
         }
+        int endPos = pos;
         next();
         
-        return new AttributeSelector(name, operator, value, context(sb.toString()));
+        return new AttributeSelector(name, operator, value, new Context(content, sb.toString(), initialPos, endPos));
         
     }
 
@@ -433,11 +425,11 @@ public class Parser {
     /**
      * negation
      *  : NOT S* negation_arg S* ')'
-     *  ;
      *
      * negation_arg
      *  : type_selector | universal | HASH | class | attrib | pseudo
-     *  ;
+     *  
+     *  TODO include "not" or not? It would be necessary to use parameters
      */
     protected NegationSelector negation(int number) throws ParserException {
         
@@ -447,17 +439,18 @@ public class Parser {
             throw new ParserException("Expected '(' at position " + pos);
         }
         sb.append(current);
+        int parenthesisPos = pos;
         next();
         ignoreWhitespaces();
         if (end()) {
             throw new ParserException("Selector expected at position " + pos);
         }
-
+        int initialPos = pos;
         SimpleSelector simpleSelector = null;
         if (current == '*') {
             //universal selector
             sb.append(current);
-            TypeSelector ts = new TypeSelector("*", context("*"));
+            TypeSelector ts = new TypeSelector("*", new Context(content, "*", initialPos, pos + 1));
             parserListener.negationTypeSelector(ts);
             simpleSelector = ts;
             next();
@@ -465,7 +458,7 @@ public class Parser {
             //type selector
             String type = identifier();
             sb.append(type);
-            TypeSelector ts = new TypeSelector(type, context(type));
+            TypeSelector ts = new TypeSelector(type, new Context(content, type, initialPos, pos));
             parserListener.negationTypeSelector(ts);
             simpleSelector = ts;
         } else if (current == '.') {
@@ -476,7 +469,7 @@ public class Parser {
             if (className == null || className.isEmpty()) {
                 throw new ParserException("Expected className at position " + pos);
             }
-            ClassSelector cs = new ClassSelector(className, context("." + className));
+            ClassSelector cs = new ClassSelector(className, new Context(content, "." + className, initialPos, pos));
             simpleSelector = cs;
             parserListener.negationClassSelector(cs);
             sb.append(className);
@@ -488,7 +481,7 @@ public class Parser {
             if (id == null || id.isEmpty()) {
                 throw new ParserException("Expected id at position " + pos);
             }
-            HashSelector hs = new HashSelector(id, context("#" + id));
+            HashSelector hs = new HashSelector(id, new Context(content, "#" + id, initialPos, pos));
             simpleSelector = hs;
             parserListener.negationIdSelector(hs);
             sb.append(id);
@@ -536,7 +529,7 @@ public class Parser {
         sb.append(current);
         next();
             
-        return new NegationSelector(simpleSelector, context(sb.toString()));
+        return new NegationSelector(simpleSelector, new Context(content, sb.toString(), parenthesisPos, pos));
         
     }
 
@@ -551,10 +544,10 @@ public class Parser {
      *  
      * functional_pseudo
      *  : FUNCTION S* expression ')'
-     *  ;
      */
     protected PseudoSelector pseudo(String ident, PseudoType type, boolean doubleColon) throws ParserException {
         
+    	int initialPost = pos;
         StringBuilder sb = new StringBuilder();
         sb.append(ident);
         PseudoExpression expression = null;
@@ -578,7 +571,7 @@ public class Parser {
             sb.append(current);
             next();
         }
-        return new PseudoSelector(ident, type, doubleColon, expression, context(sb.toString()));
+        return new PseudoSelector(ident, type, doubleColon, expression, new Context(content, sb.toString(), initialPost, pos));
         
     }
     
@@ -587,7 +580,6 @@ public class Parser {
      *  // In CSS3, the expressions are identifiers, strings, 
      *  // or of the form "an+b" 
      *  : [ [ PLUS | '-' | DIMENSION | NUMBER | STRING | IDENT ] S* ]+
-     *  ;
      *  
      *  {num}{ident}     return DIMENSION;
      *  {num}            return NUMBER;
@@ -623,8 +615,11 @@ public class Parser {
                     items.add(new Item(Type.Number, number));
                 }
             } else if (current == '\'' || current == '"') {
+            	Character quote = current;
                 String s = string();
+                sb.append(quote);
                 sb.append(s);
+                sb.append(quote);
                 items.add(new Item(Type.StringType, s));
             } else {
                 break;

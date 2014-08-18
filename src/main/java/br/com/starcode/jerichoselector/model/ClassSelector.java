@@ -1,6 +1,6 @@
 package br.com.starcode.jerichoselector.model;
 
-public class ClassSelector extends AbstractContext implements SimpleSelector {
+public class ClassSelector extends SimpleSelector  {
     
     private String name;
     

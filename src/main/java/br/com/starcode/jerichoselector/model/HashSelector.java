@@ -6,9 +6,8 @@ public class HashSelector extends SimpleSelector {
     
     public HashSelector(
             String hash, 
-            Combinator combinator,
             Context context) {
-        super(combinator, context);
+        super(context);
         this.hash = hash;
     }
 

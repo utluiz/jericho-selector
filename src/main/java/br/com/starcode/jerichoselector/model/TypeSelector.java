@@ -7,9 +7,8 @@ public class TypeSelector extends SimpleSelector {
     
     public TypeSelector(
             String type, 
-            Combinator combinator,
             Context context) {
-        super(combinator, context);
+        super(context);
         this.type = type;
         this.isUniversal = "*".equals(type);
     }

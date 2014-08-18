@@ -5,8 +5,9 @@ import java.util.List;
 public class Selector extends AbstractContext {
 
     private List<SimpleSelectorSequence> simpleSelectors;
+    private List<Combinator> combinators;
     
-    public Selector(List<SimpleSelectorSequence> simpleSelectors, Context context) {
+    public Selector(List<SimpleSelectorSequence> simpleSelectors, List<Combinator> combinators, Context context) {
         super(context);
         this.simpleSelectors = simpleSelectors;
     }
@@ -14,5 +15,9 @@ public class Selector extends AbstractContext {
     public List<SimpleSelectorSequence> getSelectors() {
         return simpleSelectors;
     }
+    
+    public List<Combinator> getCombinators() {
+		return combinators;
+	}
     
 }

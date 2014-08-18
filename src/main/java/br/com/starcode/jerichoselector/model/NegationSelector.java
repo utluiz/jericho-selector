@@ -6,9 +6,8 @@ public class NegationSelector extends SimpleSelector {
     
     public NegationSelector(
             SimpleSelector simpleSelector, 
-            Combinator combinator,
             Context context) {
-        super(combinator, context);
+        super(context);
         this.simpleSelector = simpleSelector;
     }
     

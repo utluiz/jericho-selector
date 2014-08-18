@@ -14,9 +14,8 @@ public class PseudoSelector extends SimpleSelector {
             PseudoType type,
             boolean doubleColon,
             PseudoExpression expression,
-            Combinator combinator,
             Context context) {
-        super(combinator, context);
+        super(context);
         this.name = name;
         this.type = type;
         this.doubleColon = doubleColon;

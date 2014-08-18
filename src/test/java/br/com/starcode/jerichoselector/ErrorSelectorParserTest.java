@@ -1,15 +1,7 @@
 package br.com.starcode.jerichoselector;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
-
-import br.com.starcode.jerichoselector.model.AttributeSelector;
-import br.com.starcode.jerichoselector.model.Context;
-import br.com.starcode.jerichoselector.model.PseudoSelector;
-import br.com.starcode.jerichoselector.model.Combinator;
 
 /**
  * Selector list:
@@ -160,69 +152,6 @@ public class ErrorSelectorParserTest {
             hasException = true;
         }
         Assert.assertTrue(hasException);
-        
-    }
-
-    private class Listener implements ParserListener {
-        
-        final List<String> lista = new ArrayList<String>();
-        
-        public void endGroup(int number, Context context) {
-            lista.add("endSelectorGroup=" + number);
-        }
-        
-        public void beginSelectorGroup(int number, Context context) {
-            lista.add("beginSelectorGroup=" + number);
-        }
-
-        public void typeSelector(Context context) {
-            lista.add("typeSelector=" + context.getContext());
-        }
-
-        public void simpleSelector(int number,
-                Combinator combinator, Context context) {
-            lista.add("simpleSelector=" + number + "|" 
-                + (combinator != null ? combinator.getSign() : null) + "|" + context.getContext());
-        }
-
-        public void classSelector(int number,
-                Context context) {
-            lista.add("classSelector=" + number + "|" + context.getContext());
-        }
-
-        public void idSelector(int number,
-                Context context) {
-            lista.add("idSelector=" + number + "|" + context.getContext());
-        }
-
-        public void attributeSelector(int number,
-                AttributeSelector as, Context context) {
-            lista.add("attributeSelector=" + number + "|" + context.getContext());
-        }
-        
-        public void pseudoSelector(int number, PseudoSelector pseudoSelector, Context context) {
-            lista.add("pseudoSelector=" + number + "|" + pseudoSelector.getType().toString() + "|" + context.getContext());
-        }
-
-        public void negationTypeSelector(int number, Context context) {
-            lista.add("negationTypeSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationClassSelector(int number, Context context) {
-            lista.add("negationClassSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationAttributeSelector(int number, AttributeSelector type, Context context) {
-            lista.add("negationAttributeSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationIdSelector(int number, Context context) {
-            lista.add("negationIdSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationPseudoSelector(int number, PseudoSelector pseudoSelector, Context context) {
-            lista.add("negationPseudoSelector=" + number + "|" + context.getContext());
-        }
         
     }
     

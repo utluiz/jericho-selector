@@ -1,15 +1,7 @@
 package br.com.starcode.jerichoselector;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
-
-import br.com.starcode.jerichoselector.model.AttributeSelector;
-import br.com.starcode.jerichoselector.model.Context;
-import br.com.starcode.jerichoselector.model.PseudoSelector;
-import br.com.starcode.jerichoselector.model.Combinator;
 
 /**
  * Selector list:
@@ -18,73 +10,6 @@ import br.com.starcode.jerichoselector.model.Combinator;
  */
 public class NegationSelectorParserTest {
 
-    private class Listener implements ParserListener {
-        
-        final List<String> lista = new ArrayList<String>();
-        
-        public void endGroup(int number, Context context) {
-            lista.add("endSelectorGroup=" + number);
-        }
-        
-        public void beginSelectorGroup(int number, Context context) {
-            lista.add("beginSelectorGroup=" + number);
-        }
-
-        public void typeSelector(Context context) {
-            lista.add("typeSelector=" + context.getContext());
-        }
-
-        public void simpleSelector(int number,
-                Combinator combinator, Context context) {
-            lista.add("simpleSelector=" + number + "|" 
-                + (combinator != null ? combinator.getSign() : null) + "|" + context.getContext());
-        }
-
-        public void classSelector(int number,
-                Context context) {
-            lista.add("classSelector=" + number + "|" + context.getContext());
-        }
-
-        public void idSelector(int number,
-                Context context) {
-            lista.add("idSelector=" + number + "|" + context.getContext());
-        }
-
-        public void attributeSelector(int number,
-                AttributeSelector as, Context context) {
-            lista.add("attributeSelector=" + number + "|" + context.getContext());
-        }
-        
-        public List<String> getLista() {
-            return lista;
-        }
-
-        public void pseudoSelector(int number, PseudoSelector pseudoSelector, Context context) {
-            lista.add("pseudoSelector=" + number + "|" + pseudoSelector.getType().toString() + "|" + context.getContext());
-        }
-
-        public void negationTypeSelector(int number, Context context) {
-            lista.add("negationTypeSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationClassSelector(int number, Context context) {
-            lista.add("negationClassSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationAttributeSelector(int number, AttributeSelector type, Context context) {
-            lista.add("negationAttributeSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationIdSelector(int number, Context context) {
-            lista.add("negationIdSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationPseudoSelector(int number, PseudoSelector pseudoSelector, Context context) {
-            lista.add("negationPseudoSelector=" + number + "|" + pseudoSelector.getType().toString() + "|" + context.getContext());
-        }
-        
-    }
-    
     @Test
     public void doubleNegation() {
         
@@ -142,11 +67,11 @@ public class NegationSelectorParserTest {
         new Parser("input:not(#ident)", l).interpret();
         //System.out.println(l.getLista());
         Assert.assertEquals(5, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=input", l.getLista().get(1));
-        Assert.assertEquals("negationIdSelector=0|ident", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|input:not(#ident)", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("negationIdSelector=ident", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|input:not(#ident)", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
     }
     
@@ -157,10 +82,10 @@ public class NegationSelectorParserTest {
         new Parser(":not(._minha_classe)", l).interpret();
         //System.out.println(l.getLista());
         Assert.assertEquals(4, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
-        Assert.assertEquals("negationClassSelector=0|_minha_classe", l.getLista().get(1));
-        Assert.assertEquals("simpleSelector=0|null|:not(._minha_classe)", l.getLista().get(2));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(3));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
+        Assert.assertEquals("negationClassSelector=_minha_classe", l.getLista().get(1));
+        Assert.assertEquals("selectorSequence=null|:not(._minha_classe)", l.getLista().get(2));
+        Assert.assertEquals("endGroup=0", l.getLista().get(3));
         
     }
     
@@ -171,11 +96,11 @@ public class NegationSelectorParserTest {
         new Parser("*:not(*)", l).interpret();
         ///System.out.println(l.getLista());
         Assert.assertEquals(5, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=*", l.getLista().get(1));
-        Assert.assertEquals("negationTypeSelector=0|*", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|*:not(*)", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("negationTypeSelector=*", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|*:not(*)", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
     }
     
@@ -186,11 +111,11 @@ public class NegationSelectorParserTest {
         new Parser("tabl:not(table)", l).interpret();
         ///System.out.println(l.getLista());
         Assert.assertEquals(5, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=tabl", l.getLista().get(1));
-        Assert.assertEquals("negationTypeSelector=0|table", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|tabl:not(table)", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("negationTypeSelector=table", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|tabl:not(table)", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
     }
     
@@ -201,11 +126,11 @@ public class NegationSelectorParserTest {
         new Parser("a:not([href])", l).interpret();
         ///System.out.println(l.getLista());
         Assert.assertEquals(5, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=a", l.getLista().get(1));
-        Assert.assertEquals("negationAttributeSelector=0|href", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|a:not([href])", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("negationAttributeSelector=href", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|a:not([href])", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
     }
     
@@ -216,11 +141,11 @@ public class NegationSelectorParserTest {
         new Parser("a:not([href='1'])", l).interpret();
         ///System.out.println(l.getLista());
         Assert.assertEquals(5, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=a", l.getLista().get(1));
-        Assert.assertEquals("negationAttributeSelector=0|href='1'", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|a:not([href='1'])", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("negationAttributeSelector=href='1'", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|a:not([href='1'])", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
     }
     
@@ -231,11 +156,11 @@ public class NegationSelectorParserTest {
         new Parser("a:not(:disable)", l).interpret();
         ///System.out.println(l.getLista());
         Assert.assertEquals(5, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=a", l.getLista().get(1));
-        Assert.assertEquals("negationPseudoSelector=0|PseudoClass|disable", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|a:not(:disable)", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("negationPseudoSelector=PseudoClass|disable", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|a:not(:disable)", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
     }
     

@@ -1,15 +1,7 @@
 package br.com.starcode.jerichoselector;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
-
-import br.com.starcode.jerichoselector.model.AttributeSelector;
-import br.com.starcode.jerichoselector.model.Context;
-import br.com.starcode.jerichoselector.model.PseudoSelector;
-import br.com.starcode.jerichoselector.model.Combinator;
 
 /**
  * Selector list:
@@ -18,73 +10,6 @@ import br.com.starcode.jerichoselector.model.Combinator;
  */
 public class PseudoSelectorParserTest {
 
-    private class Listener implements ParserListener {
-        
-        final List<String> lista = new ArrayList<String>();
-        
-        public void endGroup(int number, Context context) {
-            lista.add("endSelectorGroup=" + number);
-        }
-        
-        public void beginSelectorGroup(int number, Context context) {
-            lista.add("beginSelectorGroup=" + number);
-        }
-
-        public void typeSelector(Context context) {
-            lista.add("typeSelector=" + context.getContext());
-        }
-
-        public void simpleSelector(int number,
-                Combinator combinator, Context context) {
-            lista.add("simpleSelector=" + number + "|" 
-                + (combinator != null ? combinator.getSign() : null) + "|" + context.getContext());
-        }
-
-        public void classSelector(int number,
-                Context context) {
-            lista.add("classSelector=" + number + "|" + context.getContext());
-        }
-
-        public void idSelector(int number,
-                Context context) {
-            lista.add("idSelector=" + number + "|" + context.getContext());
-        }
-
-        public void attributeSelector(int number,
-                AttributeSelector as, Context context) {
-            lista.add("attributeSelector=" + number + "|" + context.getContext());
-        }
-        
-        public List<String> getLista() {
-            return lista;
-        }
-
-        public void pseudoSelector(int number, PseudoSelector pseudoSelector, Context context) {
-            lista.add("pseudoSelector=" + number + "|" + pseudoSelector.getType().toString() + "|" + context.getContext());
-        }
-
-        public void negationTypeSelector(int number, Context context) {
-            lista.add("negationTypeSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationClassSelector(int number, Context context) {
-            lista.add("negationClassSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationAttributeSelector(int number, AttributeSelector type, Context context) {
-            lista.add("negationAttributeSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationIdSelector(int number, Context context) {
-            lista.add("negationIdSelector=" + number + "|" + context.getContext());
-        }
-
-        public void negationPseudoSelector(int number, PseudoSelector pseudoSelector, Context context) {
-            lista.add("negationPseudoSelector=" + number + "|" + pseudoSelector.getType().toString() + "|" + context.getContext());
-        }
-        
-    }
-    
     @Test
     public void pseudoClassSelector() throws Exception {
         
@@ -92,11 +17,11 @@ public class PseudoSelectorParserTest {
         new Parser("input:enabled", l).interpret();
         //System.out.println(l.getLista());
         Assert.assertEquals(5, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=input", l.getLista().get(1));
-        Assert.assertEquals("pseudoSelector=0|PseudoClass|enabled", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|input:enabled", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("pseudoSelector=PseudoClass|enabled", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|input:enabled", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
     }
     
@@ -107,11 +32,11 @@ public class PseudoSelectorParserTest {
         new Parser("input::anything", l).interpret();
         //System.out.println(l.getLista());
         Assert.assertEquals(5, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=input", l.getLista().get(1));
-        Assert.assertEquals("pseudoSelector=0|PseudoElement|anything", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|input::anything", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("pseudoSelector=PseudoElement|anything", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|input::anything", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
     }
     
@@ -120,35 +45,35 @@ public class PseudoSelectorParserTest {
         
         Listener l = new Listener();
         new Parser("input:first-line", l).interpret();
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=input", l.getLista().get(1));
-        Assert.assertEquals("pseudoSelector=0|PseudoElement|first-line", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|input:first-line", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("pseudoSelector=PseudoElement|first-line", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|input:first-line", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
         l = new Listener();
         new Parser("input:first-letter", l).interpret();
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=input", l.getLista().get(1));
-        Assert.assertEquals("pseudoSelector=0|PseudoElement|first-letter", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|input:first-letter", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("pseudoSelector=PseudoElement|first-letter", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|input:first-letter", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
         l = new Listener();
         new Parser("input:before", l).interpret();
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=input", l.getLista().get(1));
-        Assert.assertEquals("pseudoSelector=0|PseudoElement|before", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|input:before", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("pseudoSelector=PseudoElement|before", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|input:before", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
         l = new Listener();
         new Parser("input:after", l).interpret();
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=input", l.getLista().get(1));
-        Assert.assertEquals("pseudoSelector=0|PseudoElement|after", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|input:after", l.getLista().get(3));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(4));
+        Assert.assertEquals("pseudoSelector=PseudoElement|after", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|input:after", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
     }
     
@@ -159,12 +84,12 @@ public class PseudoSelectorParserTest {
         new Parser("input:enabled:hover", l).interpret();
         //System.out.println(l.getLista());
         Assert.assertEquals(6, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=input", l.getLista().get(1));
-        Assert.assertEquals("pseudoSelector=0|PseudoClass|enabled", l.getLista().get(2));
-        Assert.assertEquals("pseudoSelector=1|PseudoClass|hover", l.getLista().get(3));
-        Assert.assertEquals("simpleSelector=0|null|input:enabled:hover", l.getLista().get(4));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(5));
+        Assert.assertEquals("pseudoSelector=PseudoClass|enabled", l.getLista().get(2));
+        Assert.assertEquals("pseudoSelector=PseudoClass|hover", l.getLista().get(3));
+        Assert.assertEquals("selectorSequence=null|input:enabled:hover", l.getLista().get(4));
+        Assert.assertEquals("endGroup=0", l.getLista().get(5));
         
     }
     
@@ -188,37 +113,68 @@ public class PseudoSelectorParserTest {
         
         Listener l = new Listener();
         new Parser("input:eq(1)", l).interpret();
-        Assert.assertEquals(6, l.getLista().size());
-        Assert.assertEquals("beginSelectorGroup=0", l.getLista().get(0));
+        Assert.assertEquals(5, l.getLista().size());
+        Assert.assertEquals("beginGroup=0", l.getLista().get(0));
         Assert.assertEquals("typeSelector=input", l.getLista().get(1));
-        Assert.assertEquals("pseudoSelector=0|PseudoClass|eq(1)", l.getLista().get(2));
-        Assert.assertEquals("simpleSelector=0|null|input:enabled:hover", l.getLista().get(4));
-        Assert.assertEquals("endSelectorGroup=0", l.getLista().get(5));
+        Assert.assertEquals("pseudoSelector=PseudoClass|eq(1)", l.getLista().get(2));
+        Assert.assertEquals("selectorSequence=null|input:eq(1)", l.getLista().get(3));
+        Assert.assertEquals("endGroup=0", l.getLista().get(4));
         
     }
     
-    /*public void pseudoSelector(int number, PseudoSelector pseudoSelector, Context context) {
-        lista.add("pseudoSelector=" + number + "|" + context.getContext());
+    @Test
+    public void pseudoClassParameterExpression() throws Exception {
+        
+        Listener l = new Listener();
+        new Parser("input:eq(2n+1)", l).interpret();
+        Assert.assertEquals("pseudoSelector=PseudoClass|eq(2n+1)", l.getLista().get(2));
+        
+        l = new Listener();
+        new Parser("input:eq( 2n + 1 )", l).interpret();
+        Assert.assertEquals("pseudoSelector=PseudoClass|eq(2n+1)", l.getLista().get(2));
+        
+        l = new Listener();
+        new Parser("input:eq( +1.5n + 3.5)", l).interpret();
+        Assert.assertEquals("pseudoSelector=PseudoClass|eq(+1.5n+3.5)", l.getLista().get(2));
+        
+        l = new Listener();
+        new Parser("input:eq(10px)", l).interpret();
+        Assert.assertEquals("pseudoSelector=PseudoClass|eq(10px)", l.getLista().get(2));
+        
     }
-
-    public void negationTypeSelector(int number, Context context) {
-        lista.add("negationTypeSelector=" + number + "|" + context.getContext());
+    
+    @Test
+    public void pseudoClassParameterExpressionMinus() throws Exception {
+        
+        Listener l = new Listener();
+        new Parser("input:eq(2n-1)", l).interpret();
+        Assert.assertEquals("pseudoSelector=PseudoClass|eq(2n-1)", l.getLista().get(2));
+        
+        l = new Listener();
+        new Parser("input:eq( -2n - 1)", l).interpret();
+        Assert.assertEquals("pseudoSelector=PseudoClass|eq(-2n-1)", l.getLista().get(2));
+        
     }
-
-    public void negationClassSelector(int number, Context context) {
-        lista.add("negationClassSelector=" + number + "|" + context.getContext());
+    
+    @Test
+    public void pseudoClassParameterConstant() throws Exception {
+    	
+    	Listener l = new Listener();
+        new Parser("input:eq(n)", l).interpret();
+        Assert.assertEquals("pseudoSelector=PseudoClass|eq(n)", l.getLista().get(2));
+        
+    	l = new Listener();
+        new Parser("input:lang(pt-br)", l).interpret();
+        Assert.assertEquals("pseudoSelector=PseudoClass|lang(pt-br)", l.getLista().get(2));
+        
+    	l = new Listener();
+        new Parser("input:lang('pt-br')", l).interpret();
+        Assert.assertEquals("pseudoSelector=PseudoClass|lang('pt-br')", l.getLista().get(2));
+        
+    	l = new Listener();
+        new Parser("input:lang(\"pt-br\")", l).interpret();
+        Assert.assertEquals("pseudoSelector=PseudoClass|lang(\"pt-br\")", l.getLista().get(2));
+        
     }
-
-    public void negationAttributeSelector(int number, AttributeSelector type, Context context) {
-        lista.add("negationAttributeSelector=" + number + "|" + context.getContext());
-    }
-
-    public void negationIdSelector(int number, Context context) {
-        lista.add("negationIdSelector=" + number + "|" + context.getContext());
-    }
-
-    public void negationPseudoSelector(int number, PseudoSelector pseudoSelector, Context context) {
-        lista.add("negationPseudoSelector=" + number + "|" + context.getContext());
-    }*/
     
 }

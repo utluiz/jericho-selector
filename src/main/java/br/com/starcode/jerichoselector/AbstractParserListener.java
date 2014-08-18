@@ -1,54 +1,53 @@
 package br.com.starcode.jerichoselector;
 
 import br.com.starcode.jerichoselector.model.AttributeSelector;
+import br.com.starcode.jerichoselector.model.ClassSelector;
 import br.com.starcode.jerichoselector.model.Combinator;
-import br.com.starcode.jerichoselector.model.Context;
+import br.com.starcode.jerichoselector.model.HashSelector;
 import br.com.starcode.jerichoselector.model.PseudoSelector;
+import br.com.starcode.jerichoselector.model.Selector;
+import br.com.starcode.jerichoselector.model.SimpleSelectorSequence;
+import br.com.starcode.jerichoselector.model.TypeSelector;
 
 public abstract class AbstractParserListener implements ParserListener {
+	
+	public void beginGroup(int number, int position) {
+	}
 
-    public void beginSelectorGroup(int number, Context context) {
-    }
+	public void endGroup(Selector group) {
+	}
 
-    public void endGroup(int number, Context context) {
-    }
+	public void selectorSequence(SimpleSelectorSequence simpleSelector, Combinator combinator) {
+	}
 
-    public void typeSelector(Context context) {
-    }
+	public void typeSelector(TypeSelector typeSelector) {
+	}
 
-    public void classSelector(int number, Context context) {
-    }
+	public void classSelector(ClassSelector classSelector) {
+	}
 
-    public void idSelector(int number, Context context) {
-    }
+	public void idSelector(HashSelector hashSelector) {
+	}
 
-    public void attributeSelector(int number, AttributeSelector as,
-            Context context) {
-    }
+	public void attributeSelector(AttributeSelector attributeSelector) {
+	}
 
-    public void pseudoSelector(int number, PseudoSelector pseudoSelector,
-            Context context) {
-    }
+	public void pseudoSelector(PseudoSelector pseudoSelector) {
+	}
 
-    public void simpleSelector(int number, Combinator combinator,
-            Context context) {
-    }
+	public void negationTypeSelector(TypeSelector typeSelector) {
+	}
 
-    public void negationTypeSelector(int number, Context context) {
-    }
+	public void negationClassSelector(ClassSelector classSelector) {
+	}
 
-    public void negationClassSelector(int number, Context context) {
-    }
+	public void negationIdSelector(HashSelector hashSelector) {
+	}
 
-    public void negationAttributeSelector(int number, AttributeSelector type,
-            Context context) {
-    }
+	public void negationAttributeSelector(AttributeSelector attributeSelector) {
+	}
 
-    public void negationIdSelector(int number, Context context) {
-    }
-
-    public void negationPseudoSelector(int number, PseudoSelector pseudoSelector,
-            Context context) {
-    }
-
+	public void negationPseudoSelector(PseudoSelector pseudoSelector) {
+	}
+	
 }

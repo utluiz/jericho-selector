@@ -2,17 +2,18 @@ package br.com.starcode.jerichoselector;
 
 import br.com.starcode.jerichoselector.model.AttributeSelector;
 import br.com.starcode.jerichoselector.model.ClassSelector;
-import br.com.starcode.jerichoselector.model.Group;
+import br.com.starcode.jerichoselector.model.Combinator;
 import br.com.starcode.jerichoselector.model.HashSelector;
 import br.com.starcode.jerichoselector.model.PseudoSelector;
+import br.com.starcode.jerichoselector.model.Selector;
 import br.com.starcode.jerichoselector.model.SimpleSelectorSequence;
 import br.com.starcode.jerichoselector.model.TypeSelector;
 
 public interface ParserListener {
 
     void beginGroup(int number, int position);
-    void endGroup(Group group);
-    void selectorSequence(SimpleSelectorSequence simpleSelector);
+    void endGroup(Selector group);
+    void selectorSequence(SimpleSelectorSequence simpleSelector, Combinator combinator);
     
     void typeSelector(TypeSelector typeSelector);
     void classSelector(ClassSelector classSelector);

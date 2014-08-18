@@ -10,9 +10,8 @@ public class AttributeSelector extends SimpleSelector {
             String name, 
             AttributeOperator operator,
             String value,
-            Combinator combinator,
             Context context) {
-        super(combinator, context);
+        super(context);
         this.name = name;
         this.operator = operator;
         this.value = value;
