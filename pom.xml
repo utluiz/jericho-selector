@@ -9,9 +9,14 @@
 	</properties>
 	<dependencies>
 		<dependency>
-		    <groupId>net.htmlparser</groupId>
-		    <artifactId>jericho-html</artifactId>
-		    <version>2.3</version>
+			<groupId>net.htmlparser.jericho</groupId>
+			<artifactId>jericho-html</artifactId>
+			<version>3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>br.com.starcode.parccser</groupId>
+			<artifactId>parccser</artifactId>
+			<version>0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -19,11 +24,11 @@
 			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.7</version>
-		</dependency>
+		</dependency> -->
 	</dependencies>
 	<build>
 		<plugins>

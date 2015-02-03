@@ -9,18 +9,16 @@ Jericho is a great library for parsing and manipulating HTML. But it lacks selec
 
 Yes, we have [jsoup][2] that has selectors, but there are differences between the projects.
 
-For instance, Jericho allows you to modify just an excerpt of the HTML, while jsoup rewrite the entire structure. It happens because Jericho regards about spaces between tags and attributes.
+For instance, Jericho allows you to modify just an excerpt of the HTML (keeping formatting and white spaces), while jsoup rewrite the entire structure. It happens because Jericho regards about each character in the document.
 
 And even if I had not any other reason, I just like options. Let each library shine in their own way. ;)
 
-## How 
+## Roadmap
 
-Roadmap:
-
-1. Build a CSS3 Selector parser based on [W3C Official Specification][3] (Status: almost done, lacks pseudo-selector `:` and UTF-8 Characters Support)
+1. Build a CSS3 Selector parser based on [W3C Official Specification][3]
+	- Status: [DONE](https://github.com/utluiz/parCSSer)
 2. Jericho Implementation for selection using the result of step 1 (`TODO`)
 3. Fluent API (`TODO`).
-4. Show correct position on erros (need to store previous token positions)
 
   [1]: http://jericho.htmlparser.net
   [2]: http://jsoup.org/
