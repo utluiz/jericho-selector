@@ -9,38 +9,101 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
+import br.com.starcode.jerichoselector.matcher.MatcherRegistry;
+import br.com.starcode.jerichoselector.matcher.SelectorMatcher;
 import br.com.starcode.parccser.ParserException;
 
 public class jerQuery {
 
-    protected List<Element> selectedElements = new ArrayList<Element>();
-    protected SelectorMatcher selectorMatcher = new SelectorMatcher(); 
-    //protected SelectorListener listener = new SelectorListener(this);
+    protected List<Element> selectedElements;
+    protected SelectorMatcher selectorMatcher; 
+    protected MatcherRegistry matcherRegistry; 
     
     /*
      * Static calls
      */
     
+    public static jerQuery $(final List<Element> e, final String initialSelector) throws ParserException {
+		if (e == null) {
+    		throw new IllegalArgumentException("Null element list!");
+    	}
+		if (initialSelector == null) {
+    		throw new IllegalArgumentException("Null selector!");
+    	}
+    	return new jerQuery(e, initialSelector);
+    }
+    
+    public static jerQuery $(final Element e, final String initialSelector) throws ParserException {
+		if (e == null) {
+    		throw new IllegalArgumentException("Null element!");
+    	}
+		if (initialSelector == null) {
+    		throw new IllegalArgumentException("Null selector!");
+    	}
+    	return new jerQuery(e, initialSelector);
+    }
+    
+    public static jerQuery $(final Element[] e, final String initialSelector) throws ParserException {
+		if (e == null) {
+    		throw new IllegalArgumentException("Null element array!");
+    	}
+		if (initialSelector == null) {
+    		throw new IllegalArgumentException("Null selector!");
+    	}
+    	return new jerQuery(e, initialSelector);
+    }
+    
     public static jerQuery $(final Source source, final String initialSelector) throws ParserException {
+		if (source == null) {
+    		throw new IllegalArgumentException("Null source!");
+    	}
+		if (initialSelector == null) {
+    		throw new IllegalArgumentException("Null selector!");
+    	}
     	return new jerQuery(source, initialSelector);
     }
     
     public static jerQuery $(String html, String initialSelector) throws ParserException {
+    	if (html == null) {
+    		throw new IllegalArgumentException("Null HTML code!");
+    	}
+		if (initialSelector == null) {
+    		throw new IllegalArgumentException("Null selector!");
+    	}
     	return new jerQuery(html, initialSelector);
     }
     
     public static jerQuery $(File file, String initialSelector) throws FileNotFoundException, IOException, ParserException {
+    	if (file == null) {
+    		throw new IllegalArgumentException("Null file!");
+    	}
+		if (initialSelector == null) {
+    		throw new IllegalArgumentException("Null selector!");
+    	}
     	return new jerQuery(file, initialSelector);
     }
     
     public static jerQuery $(InputStream input, String initialSelector) throws IOException, ParserException {
+    	if (input == null) {
+    		throw new IllegalArgumentException("Null input stream!");
+    	}
+		if (initialSelector == null) {
+    		throw new IllegalArgumentException("Null selector!");
+    	}
     	return new jerQuery(input, initialSelector);
     }
     
     public static jerQuery $(Reader reader, String initialSelector) throws IOException, ParserException {
+    	if (reader == null) {
+    		throw new IllegalArgumentException("Null reader!");
+    	}
+		if (initialSelector == null) {
+    		throw new IllegalArgumentException("Null selector!");
+    	}
     	return new jerQuery(reader, initialSelector);
     }
     
@@ -49,6 +112,9 @@ public class jerQuery {
      */
     
     public jerQuery(List<Element> elements) {
+    	this.selectedElements = new ArrayList<Element>();
+    	this.matcherRegistry = new MatcherRegistry();
+    	this.selectorMatcher = new SelectorMatcher(matcherRegistry); 
         this.selectedElements.addAll(elements);
     }
     
@@ -57,7 +123,7 @@ public class jerQuery {
     }
     
     public jerQuery(Element e) {
-        this.selectedElements.add(e);
+        this(new Element[] { e });
     }
     
 	public jerQuery(Source source) {
@@ -128,7 +194,7 @@ public class jerQuery {
      * Aux Methods
      */
     
-    protected List<Element> applySelector(Element e, String selector) throws ParserException {
+    protected Set<Element> applySelector(Element e, String selector) throws ParserException {
         return selectorMatcher.applySelector(e, selector);
     }
     
@@ -156,6 +222,18 @@ public class jerQuery {
     public int length() {
     	return selectedElements.size();
     }
+    
+    public MatcherRegistry getMatcherRegistry() {
+		return matcherRegistry;
+	}
+    
+    public void setMatcherRegistry(MatcherRegistry matcherRegistry) {
+		this.matcherRegistry = matcherRegistry;
+	}
+    
+    public List<Element> getSelectedElements() {
+		return selectedElements;
+	}
     
     @Override
     public String toString() {
