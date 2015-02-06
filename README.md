@@ -1,4 +1,4 @@
-Jericho Selector
+Jericho Selector  [![Build Status](https://travis-ci.org/utluiz/parCSSer.svg?branch=master)](https://travis-ci.org/utluiz/jericho-selector)
 ================
 
 jQuery-like selector for [Jericho HTML Parser][1].
