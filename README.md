@@ -1,7 +1,7 @@
 Jericho Selector
 ================
 
-jQuery-like selector capabilities to [Jericho HTML Parser][1].
+jQuery-like selector for [Jericho HTML Parser][1].
 
 ## Why
 
@@ -16,9 +16,13 @@ And even if I had not any other reason, I just like options. Let each library sh
 ## Roadmap
 
 1. Build a CSS3 Selector parser based on [W3C Official Specification][3]
-	- Status: [DONE](https://github.com/utluiz/parCSSer)
-2. Jericho Implementation for selection using the result of step 1 (`TODO`)
-3. Fluent API (`TODO`).
+	- Status: [**DONE**](https://github.com/utluiz/parCSSer)
+2. Jericho Implementation for elements selection using the parser from step 1
+    - STATUS: **DONE**
+3. Fluent API
+    - STATUS: **DONE**
+4. Improve performance of specific selectors (shortcuts)
+    -STATUS: TO DO
 
   [1]: http://jericho.htmlparser.net
   [2]: http://jsoup.org/

@@ -91,20 +91,25 @@ public class SelectorMatcher {
 		switch (combinator) {
 		case DESCENDANT:
 			combinedElements.addAll(e.getAllElements());
+			combinedElements.remove(e);
 			break;
 		case CHILD:
 			combinedElements.addAll(e.getChildElements());
 			break;
 		case ADJASCENT_SIBLING:
-			List<Element> siblings = e.getParentElement().getChildElements();
-			int pos = siblings.indexOf(e);
-			if (pos < siblings.size() - 1) {
-				combinedElements.add(siblings.get(pos + 1));
+			if (e.getParentElement() != null) {
+				List<Element> siblings = e.getParentElement().getChildElements();
+				int pos = siblings.indexOf(e);
+				if (pos < siblings.size() - 1) {
+					combinedElements.add(siblings.get(pos + 1));
+				}
 			}
 			break;
 		case GENERAL_SIBLING:
-			combinedElements.addAll(e.getParentElement().getChildElements());
-			combinedElements.remove(e);
+			if (e.getParentElement() != null) {
+				combinedElements.addAll(e.getParentElement().getChildElements());
+				combinedElements.remove(e);
+			}
 			break;
 		default:
 			return;

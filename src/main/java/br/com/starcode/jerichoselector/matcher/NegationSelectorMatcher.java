@@ -5,14 +5,16 @@ import br.com.starcode.parccser.model.NegationSelector;
 
 public class NegationSelectorMatcher implements SimpleSelectorMatcher<NegationSelector> {
 	
-	MatcherRegistry matcherRegistry = new MatcherRegistry();
+	MatcherRegistry matcherRegistry;
 	
 	public NegationSelectorMatcher(MatcherRegistry matcherRegistry) {
 		this.matcherRegistry = matcherRegistry;
 	}
 
 	public boolean matches(Element e, NegationSelector simpleSelector) {
-		return !matcherRegistry.get(simpleSelector.getSimpleSelector()).matches(e, simpleSelector);
+		return !matcherRegistry.get(
+				simpleSelector.getSimpleSelector()
+			).matches(e, simpleSelector.getSimpleSelector());
 	}
 
 }

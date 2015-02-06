@@ -1,0 +1,23 @@
+language: java
+jdk:
+- oraclejdk8
+#- oraclejdk7
+#- openjdk7
+env:
+  global:
+  # SONATYPE_USERNAME
+  - secure: Z4Uog23iOIu1hig9Jo6EG1SNMlf9ccFwgCgRgwuzlJkUWIdSfmDTpC0zhEK4I6fstMwCYOn96ZmzjLqwRZac/6FBcxdmZYd2ZsNYTG8LrRTPYswxFLhSL8oVGD6Rrw+yo3r1nRPekFsbAmEVrSoxX6thkhtldEyve2J7OIQeJ7g=
+  # SONATYPE_PASSWORD
+  - secure: CGO0xjROQydae1Z1dYlkT/cE0pvPUdGv8mIZtOLR48P4Hb+E8WBjIhagDr3OYZEywDGdwVq2eZqQzbN5UGggCdnTmR1ntQCg8nfvK/PiaVrOXcm2fS+PB+PFuilwsNIibAVLZkGQMV+XudjvDAvTlq2Pp9X7geKKppxoRCAlPKc=
+  # GPG_PASSPHRASE
+  - secure: EWH1cxXUCH40iCgEzNCgCpgP0Ev+tSCJkXYou5a7A5jIF8+eJQhZsXen8nxiptgp1iTjRp8zN0mFNvYcQIIG/46/3jJuZ0/orz/jo9zYVawD2izDv50OKf868IwUCjagD1EvMTaCc9pu6UQJnNjcR90Zc6QHpH4Samlacxlw5hA=
+  # ENC_SECRET
+  - secure: "epqcUfjdyWXf/iZ97672mJInkNEKWdPuo+6CZePb/YHuTIcNFrVctnMMkkzQz5GY9iybBc76qMpZEuVDWxaEEqn8vH5GyNJ67XkENhCHOft7RS49cKTmBOxfjjoFf3fsz1tGAfKbY7i0PJYkugmdb6tYeyjJzqvta13RGeIYZd8="
+before_install:
+- mkdir gpg
+- openssl aes-256-cbc -k "$ENC_SECRET" -in deploy-files/secring.gpg.enc -d -a -out gpg/secring.gpg
+- openssl aes-256-cbc -k "$ENC_SECRET" -in deploy-files/pubring.gpg.enc -d -a -out gpg/pubring.gpg
+after_success:
+- java_version=$(javac -version) 
+#- "[[ $java_version =~ 1.8 ]] && mvn deploy -DskipTests=true -B -V --settings deploy-files/settings.xml"
+- mvn deploy -DskipTests=true -B -V --settings deploy-files/settings.xml

@@ -7,6 +7,8 @@ import net.htmlparser.jericho.Element;
 import br.com.starcode.parccser.model.AttributeSelector;
 import br.com.starcode.parccser.model.ClassSelector;
 import br.com.starcode.parccser.model.HashSelector;
+import br.com.starcode.parccser.model.NegationSelector;
+import br.com.starcode.parccser.model.PseudoSelector;
 import br.com.starcode.parccser.model.SimpleSelector;
 import br.com.starcode.parccser.model.TypeSelector;
 
@@ -20,6 +22,8 @@ public class MatcherRegistry {
 		simpleSelectorMatchers.put(HashSelector.class, new HashSelectorMatcher());
 		simpleSelectorMatchers.put(TypeSelector.class, new TypeSelectorMatcher());
 		simpleSelectorMatchers.put(ClassSelector.class, new ClassSelectorMatcher());
+		simpleSelectorMatchers.put(NegationSelector.class, new NegationSelectorMatcher(this));
+		simpleSelectorMatchers.put(PseudoSelector.class, new PseudoSelectorMatcher());
 	}
 	
 	public <T extends SimpleSelector> SimpleSelectorMatcher<T> get(T simpleSelector) {
@@ -37,6 +41,13 @@ public class MatcherRegistry {
 	public <T extends SimpleSelector> boolean matches(Element e, T simpleSelector) {
 		SimpleSelectorMatcher<T> matcher = get(simpleSelector);
 		return matcher.matches(e, simpleSelector);
+	}
+	
+	public <T extends SimpleSelector> void register(SimpleSelectorMatcher<T> matcher, T simpleSelector) {
+		if (matcher == null || simpleSelector == null) {
+			throw new IllegalArgumentException("Null parameter!");
+		}
+		simpleSelectorMatchers.put(simpleSelector.getClass(), matcher);
 	}
 
 }
