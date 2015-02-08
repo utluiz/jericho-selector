@@ -23,7 +23,7 @@ Just add the following dependency:
 		<version>1.0.1-RELEASE</version>
 	</dependency>
 	
-Import the static method ``$ that is used as the entry point:
+Import the static method `$` that is used as the entry point:
 
 	import static br.com.starcode.jerichoselector.jerQuery.$;
 	
