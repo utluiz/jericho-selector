@@ -42,6 +42,7 @@ public class TestAvancedSelectors {
     @Test
 	public void noResults() throws Exception {
     	 List<Element> elements = $(source.getChildElements().get(0), "#id2").getSelectedElements();
+    	 //no elements
          assertEquals(0, elements.size());
 	}
     
