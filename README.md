@@ -36,16 +36,20 @@ This method is overloaded several times, so you have a lot of input optionsL. Ha
 ## Status
 
 - CSS3 Selector parser library based on [W3C Official Specification][3]
-	- Status: [**DONE**](https://github.com/utluiz/parCSSer)
-- Jericho Implementation for selection using the parser from step 1
+	- Status: [**DONE**][5]
+- Element selector implementation using Jericho HTML Parser and the parser from step
     - STATUS: **DONE**
     
 ## Roadmap
 
-- Fluent API based on jQuery (find, not, closest, etc.)
+- Improve performance of specific selectors (shortcuts)
     - STATUS: TO DO
-4. Improve performance of specific selectors (shortcuts)
-    - STATUS: TO DO
+- [Transversing methods][9]
+- [jQuery extended features][4]
+- [DOM manipulation][6]
+- [Attributes handling][7]
+- [`val()` function][8]
+- [`each()`](http://api.jquery.com/each/)  (allow lambda expressions), [`index()`](http://api.jquery.com/index/), [`length()`](http://api.jquery.com/length/), [`selector()`](http://api.jquery.com/selector/), [`contains()`](http://api.jquery.com/jQuery.contains/), [`grep`](http://api.jquery.com/jQuery.grep/)
     
 ## Get in touch
 
@@ -56,3 +60,9 @@ Just go to [http://luizricardo.org](http://luizricardo.org/en/who-i-am/#contact)
   [1]: http://jericho.htmlparser.net
   [2]: http://jsoup.org/
   [3]: http://www.w3.org/TR/css3-selectors/
+  [4]: http://api.jquery.com/category/selectors/jquery-selector-extensions/
+  [5]: https://github.com/utluiz/parCSSer
+  [6]: http://api.jquery.com/category/manipulation/
+  [7]: http://api.jquery.com/category/attributes/
+  [8]: http://api.jquery.com/val/
+  [9]: http://api.jquery.com/category/traversing/
