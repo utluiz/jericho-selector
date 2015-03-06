@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TreeSet;
 
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
@@ -213,29 +214,29 @@ public class jerQuery {
         findInitial(selector);
     }
     
+    protected void findInitial(String selector) throws ParserException {
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>();
+        for (Element e : selectedElements) {
+            newSelectedElements.addAll(selectorMatcher.applySelector(e, selector));
+        }
+        selectedElements = new ArrayList<Element>(newSelectedElements);
+    }
+    
     /*
      * Transversing API methods:
      * http://api.jquery.com/category/traversing/ 
      */
-    
-    public void findInitial(String selector) throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>();
-        for (Element e : selectedElements) {
-            newSelectedElements.addAll(selectorMatcher.applySelector(e, selector));
-        }
-        selectedElements = newSelectedElements;
-    }
     
     /**
      * Get the descendants of each element in the current set of matched elements, filtered by a selector, jQuery object, or element.
      * {@link http://api.jquery.com/find/} 
      */
     public jerQuery find(String selector) throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>();
+        TreeSet<Element> newSelectedElements = new TreeSet<Element>();
         for (Element e : selectedElements) {
             newSelectedElements.addAll(selectorMatcher.applySelector(e, selector));
         }
-        return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+        return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
     
     /**
@@ -243,11 +244,11 @@ public class jerQuery {
      * {@link http://api.jquery.com/find/} 
      */
     protected jerQuery findFromRoot(String selector) throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>();
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>();
         for (Element e : source.getChildElements()) {
             newSelectedElements.addAll(selectorMatcher.applySelector(e, selector));
         }
-        return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, null);
+        return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, null);
     }
     
     /**
@@ -255,9 +256,9 @@ public class jerQuery {
      * {@link http://api.jquery.com/add/} 
      */
     public jerQuery add(Element e) throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>(getSelectedElements());
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>(getSelectedElements());
         newSelectedElements.add(e);
-        return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+        return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
     
     /**
@@ -265,9 +266,9 @@ public class jerQuery {
      * {@link http://api.jquery.com/add/} 
      */
     public jerQuery add(List<Element> list) throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>(getSelectedElements());
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>(getSelectedElements());
         newSelectedElements.addAll(list);
-        return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+        return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
     
     /**
@@ -275,11 +276,13 @@ public class jerQuery {
      * {@link http://api.jquery.com/addBack/} 
      */
     public jerQuery addBack() throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>(getSelectedElements());
-        if (getPreviousQuery() != null) {
-        	newSelectedElements.addAll(getPreviousQuery().getSelectedElements());
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>(getSelectedElements());
+    	jerQuery previous = getPreviousQuery(); 
+        if (previous != null) {
+        	newSelectedElements.addAll(previous.getSelectedElements());
+        	previous = previous.getPreviousQuery();
         }
-        return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+        return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, previous);
     }
     
     /**
@@ -287,11 +290,13 @@ public class jerQuery {
      * {@link http://api.jquery.com/addBack/} 
      */
     public jerQuery addBack(String selector) throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>(getSelectedElements());
-        if (getPreviousQuery() != null) {
-        	newSelectedElements.addAll(getPreviousQuery().filter(selector).getSelectedElements());
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>(getSelectedElements());
+    	jerQuery previous = getPreviousQuery(); 
+        if (previous != null) {
+        	newSelectedElements.addAll(previous.filter(selector).getSelectedElements());
+        	previous = previous.getPreviousQuery();
         }
-        return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+        return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, previous);
     }
     
     /**
@@ -300,11 +305,11 @@ public class jerQuery {
      * TODO exclude text nodes
      */
     public jerQuery children() throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>();
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>();
     	for (Element element : getSelectedElements()) {
 			newSelectedElements.addAll(element.getChildElements());
 		}
-        return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+        return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
     
     /**
@@ -313,7 +318,7 @@ public class jerQuery {
      * TODO exclude text nodes
      */
     public jerQuery children(String selector) throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>();
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>();
         jerQuery jq = findFromRoot(selector);
     	for (Element element : getSelectedElements()) {
     		for (Element child : element.getChildElements()) {
@@ -322,7 +327,7 @@ public class jerQuery {
 	    		}
     		}
 		}
-        return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+        return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
     
     /**
@@ -330,11 +335,11 @@ public class jerQuery {
      * {@link http://api.jquery.com/contents/} 
      */
     public jerQuery contents() throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>();
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>();
     	for (Element element : getSelectedElements()) {
 			newSelectedElements.addAll(element.getChildElements());
 		}
-        return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+        return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
     
     /**
@@ -344,7 +349,7 @@ public class jerQuery {
     public jerQuery each(IEachFunction function) throws ParserException {
     	int index = 0;
     	for (Element element : getSelectedElements()) {
-    		function.execute(index++, element);
+    		function.execute(++index, element);
 		}
         return this;
     }
@@ -367,11 +372,11 @@ public class jerQuery {
     	} else {
     		index--;
     	}
-    	List<Element> newSelectedElements = new ArrayList<Element>();
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>();
     	if (index >= 0 && index < length()) {
     		newSelectedElements.add(getSelectedElements().get(index));
     	}
-    	return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+    	return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
     
     /**
@@ -388,16 +393,14 @@ public class jerQuery {
      * {@link http://api.jquery.com/filter/} 
      */
     public jerQuery filter(String selector) throws ParserException {
-        List<Element> newSelectedElements = new ArrayList<Element>();
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>();
         jerQuery jq = findFromRoot(selector);
-        if (getPreviousQuery() != null) {
-        	for (Element element : getPreviousQuery().getSelectedElements()) {
-    			if (jq.getSelectedElements().contains(element)) {
-    				newSelectedElements.add(element);
-    			}
-    		}
-        }
-        return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+    	for (Element element : getSelectedElements()) {
+			if (jq.getSelectedElements().contains(element)) {
+				newSelectedElements.add(element);
+			}
+		}
+        return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
     
     /**
@@ -406,13 +409,15 @@ public class jerQuery {
      */
     public jerQuery has(String selector) throws ParserException {
     	jerQuery jq = findFromRoot(selector);
-    	List<Element> newSelectedElements = new ArrayList<Element>();
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>();
     	for (Element element : getSelectedElements()) {
-			if (jq.getSelectedElements().contains(element)) {
-				newSelectedElements.add(element);
+    		for (Element hasElement : jq.getSelectedElements()) {
+				if (element.encloses(hasElement)) {
+					newSelectedElements.add(element);
+				}
 			}
 		}
-    	return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+    	return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
     
     /**
@@ -434,10 +439,10 @@ public class jerQuery {
      * @see {@link http://api.jquery.com/closest/} 
      */
     public jerQuery closest(String selector) throws ParserException {
-    	List<Element> newSelectedElements = new ArrayList<Element>();
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>();
     	jerQuery jq = findFromRoot(selector);
     	for (Element e : getSelectedElements()) {
-    		Element parent = e.getParentElement();
+    		Element parent = e;
     		while (parent != null) {
     			if (jq.getSelectedElements().contains(parent)) {
     				newSelectedElements.add(parent);
@@ -446,7 +451,7 @@ public class jerQuery {
     			parent = parent.getParentElement();
     		}
     	}
-    	return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+    	return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
     
     /**
@@ -462,14 +467,14 @@ public class jerQuery {
      * {@link http://api.jquery.com/map/} 
      */
     public jerQuery map(IMapFunction function) throws ParserException {
-    	List<Element> newSelectedElements = new ArrayList<Element>();
+    	TreeSet<Element> newSelectedElements = new TreeSet<Element>();
     	int index = 0;
     	for (Element element : getSelectedElements()) {
     		if (function.map(index++, element)) {
     			newSelectedElements.add(element);
     		}
 		}
-    	return new jerQuery(newSelectedElements, matcherRegistry, selectorMatcher, source, this);
+    	return new jerQuery(new ArrayList<Element>(newSelectedElements), matcherRegistry, selectorMatcher, source, this);
     }
 
     protected String getText() throws IOException {
@@ -498,6 +503,11 @@ public class jerQuery {
     
     public Element get(int index) {
     	return selectedElements.get(index);
+    }
+    
+    public String attr(String attributeName) {
+    	if (selectedElements.isEmpty()) return null;
+    	return get(0).getAttributeValue(attributeName);
     }
     
     public Source getSource() {

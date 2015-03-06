@@ -1,5 +1,9 @@
-Jericho Selector  [![Build Status](https://travis-ci.org/utluiz/parCSSer.svg?branch=master)](https://travis-ci.org/utluiz/jericho-selector)
+Jericho Selector
 ================
+
+[![Build Status](https://travis-ci.org/utluiz/parCSSer.svg?branch=master)](https://travis-ci.org/utluiz/jericho-selector)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/br.com.starcode.jerichoselector/jericho-selector/badge.svg)](https://maven-badges.herokuapp.com/maven-central/br.com.starcode.jerichoselector/jericho-selector)
+
 
 jQuery-like selector for [Jericho HTML Parser][1].
 
@@ -20,7 +24,7 @@ Just add the following dependency:
 	<dependency>
 		<groupId>br.com.starcode.jerichoselector</groupId>
 		<artifactId>jericho-selector</artifactId>
-		<version>1.0.1-RELEASE</version>
+		<version>1.0.3-RELEASE</version>
 	</dependency>
 	
 Import the static method `$` that is used as the entry point:
@@ -43,12 +47,11 @@ This method is overloaded several times, so you have a lot of input optionsL. Ha
 ## Roadmap
 
 - Improve performance of specific selectors (shortcuts)
-    - STATUS: TO DO
-- [Transversing methods][9]
+- [Transversing methods][9] (partially implemented)
 - [jQuery extended features][4]
 - [DOM manipulation][6]
 - [Attributes handling][7]
-- [`val()` function][8]
+- [`val()`][8]
 - [`each()`](http://api.jquery.com/each/)  (allow lambda expressions), [`index()`](http://api.jquery.com/index/), [`length()`](http://api.jquery.com/length/), [`selector()`](http://api.jquery.com/selector/), [`contains()`](http://api.jquery.com/jQuery.contains/), [`grep`](http://api.jquery.com/jQuery.grep/)
     
 ## Get in touch

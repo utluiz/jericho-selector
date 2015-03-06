@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>br.com.starcode.jerichoselector</groupId>
 	<artifactId>jericho-selector</artifactId>
-	<version>1.0.1-RELEASE</version>
+	<version>1.0.2-RELEASE</version>
 	<name>Jericho Selector</name>
 	<description>jQuery like CSS Selector for Jericho HTML Parser</description>
 	<url>https://github.com/utluiz/jericho-selector</url>
