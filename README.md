@@ -24,7 +24,7 @@ Just add the following dependency:
 	<dependency>
 		<groupId>br.com.starcode.jerichoselector</groupId>
 		<artifactId>jericho-selector</artifactId>
-		<version>1.0.3-RELEASE</version>
+		<version>1.0.1-RELEASE</version>
 	</dependency>
 	
 Import the static method `$` that is used as the entry point:
